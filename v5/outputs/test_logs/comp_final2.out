@@ -1,0 +1,47 @@
+[SafeGen] Device auto-detected: cuda
+[SafeGen] Loading model (quantize=None)...
+The fast path is not available because one of the required library is not installed. Falling back to torch implementation. To install follow https://github.com/fla-org/flash-linear-attention#installation and https://github.com/Dao-AILab/causal-conv1d
+Loading weights:   0%|          | 0/427 [00:00<?, ?it/s]Loading weights:   0%|          | 1/427 [00:01<08:42,  1.23s/it]Loading weights:   0%|          | 2/427 [00:02<09:44,  1.38s/it]Loading weights:   2%|▏         | 7/427 [00:03<03:05,  2.27it/s]Loading weights:   2%|▏         | 8/427 [00:04<03:26,  2.03it/s]Loading weights:   2%|▏         | 9/427 [00:05<03:25,  2.03it/s]Loading weights:   2%|▏         | 10/427 [00:05<03:25,  2.03it/s]Loading weights:   3%|▎         | 12/427 [00:06<03:35,  1.92it/s]Loading weights:   3%|▎         | 13/427 [00:07<03:49,  1.80it/s]Loading weights:   3%|▎         | 14/427 [00:08<04:14,  1.62it/s]Loading weights:   4%|▎         | 15/427 [00:08<04:02,  1.70it/s]Loading weights:   5%|▍         | 21/427 [00:09<01:52,  3.62it/s]Loading weights:   5%|▌         | 22/427 [00:10<02:21,  2.86it/s]Loading weights:   5%|▌         | 23/427 [00:11<03:26,  1.96it/s]Loading weights:   6%|▌         | 24/427 [00:12<04:17,  1.56it/s]Loading weights:   6%|▌         | 26/427 [00:13<03:48,  1.75it/s]Loading weights:   6%|▋         | 27/427 [00:14<03:52,  1.72it/s]Loading weights:   7%|▋         | 28/427 [00:14<03:15,  2.04it/s]Loading weights:   7%|▋         | 29/427 [00:14<02:48,  2.37it/s]Loading weights:   8%|▊         | 35/427 [00:14<01:02,  6.29it/s]Loading weights:   9%|▊         | 37/427 [00:14<00:52,  7.49it/s]Loading weights:  12%|█▏        | 51/427 [00:15<00:18, 20.58it/s]Loading weights:  16%|█▌        | 67/427 [00:15<00:09, 38.60it/s]Loading weights:  21%|██        | 88/427 [00:15<00:05, 65.32it/s]Loading weights:  23%|██▎       | 100/427 [00:15<00:04, 75.04it/s]Loading weights:  28%|██▊       | 120/427 [00:15<00:03, 100.37it/s]Loading weights:  43%|████▎     | 185/427 [00:15<00:01, 224.72it/s]Loading weights:  61%|██████    | 259/427 [00:15<00:00, 350.34it/s]Loading weights:  81%|████████  | 345/427 [00:15<00:03, 21.83it/s] 
+Traceback (most recent call last):
+  File "/tmp/test_v5_comprehensive.py", line 23, in <module>
+    gen = SafeGenerator()
+          ^^^^^^^^^^^^^^^
+  File "/root/train/scripts/serve/safe_generator_v5.py", line 121, in __init__
+    self.model = _load_quantized_model(BASE, quantize, DEVICE)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/train/scripts/serve/safe_generator_v5.py", line 47, in _load_quantized_model
+    model = AutoModelForCausalLM.from_pretrained(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/site-packages/transformers/models/auto/auto_factory.py", line 374, in from_pretrained
+    return model_class.from_pretrained(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/site-packages/transformers/modeling_utils.py", line 4137, in from_pretrained
+    loading_info, disk_offload_index = cls._load_pretrained_model(model, state_dict, checkpoint_files, load_config)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/site-packages/transformers/modeling_utils.py", line 4256, in _load_pretrained_model
+    loading_info, disk_offload_index = convert_and_load_state_dict_in_model(
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/site-packages/transformers/core_model_loading.py", line 1212, in convert_and_load_state_dict_in_model
+    realized_value = mapping.convert(
+                     ^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/site-packages/transformers/core_model_loading.py", line 678, in convert
+    collected_tensors = self.materialize_tensors()
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/site-packages/transformers/core_model_loading.py", line 654, in materialize_tensors
+    tensors = [future.result() for future in tensors if future.result() is not None]
+                                                        ^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/root/miniconda3/lib/python3.12/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/site-packages/transformers/core_model_loading.py", line 800, in _job
+    return _materialize_copy(tensor, device, dtype)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/site-packages/transformers/core_model_loading.py", line 789, in _materialize_copy
+    tensor = tensor.to(device=device, dtype=dtype)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 96.00 MiB. GPU 0 has a total capacity of 31.36 GiB of which 29.69 MiB is free. Process 47808 has 17.01 GiB memory in use. Including non-PyTorch memory, this process has 14.31 GiB memory in use. Of the allocated memory 13.72 GiB is allocated by PyTorch, and 23.95 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)

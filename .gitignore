@@ -1,0 +1,7 @@
+# Training data (207MB, regeneratable)
+v5/data/
+
+# IDE
+.vscode/
+__pycache__/
+.DS_Store

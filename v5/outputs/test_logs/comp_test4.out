@@ -1,0 +1,15 @@
+[SafeGen] Device auto-detected: cuda
+[SafeGen] Loading model (quantize=None)...
+The fast path is not available because one of the required library is not installed. Falling back to torch implementation. To install follow https://github.com/fla-org/flash-linear-attention#installation and https://github.com/Dao-AILab/causal-conv1d
+Loading weights:   0%|          | 0/427 [00:00<?, ?it/s]Loading weights:   0%|          | 1/427 [00:00<02:13,  3.19it/s]Loading weights:   0%|          | 2/427 [00:00<02:30,  2.82it/s]Loading weights:   2%|▏         | 7/427 [00:01<00:50,  8.29it/s]Loading weights:   2%|▏         | 8/427 [00:01<01:04,  6.54it/s]Loading weights:   2%|▏         | 9/427 [00:01<01:04,  6.50it/s]Loading weights:   2%|▏         | 10/427 [00:01<01:16,  5.48it/s]Loading weights:   3%|▎         | 12/427 [00:02<01:10,  5.88it/s]Loading weights:   3%|▎         | 13/427 [00:02<01:15,  5.50it/s]Loading weights:   3%|▎         | 14/427 [00:02<01:29,  4.64it/s]Loading weights:   4%|▎         | 15/427 [00:02<01:27,  4.69it/s]Loading weights:   5%|▍         | 21/427 [00:03<00:40, 10.05it/s]Loading weights:   5%|▌         | 22/427 [00:03<00:44,  9.02it/s]Loading weights:   5%|▌         | 23/427 [00:03<01:02,  6.45it/s]Loading weights:   6%|▌         | 24/427 [00:03<01:10,  5.74it/s]Loading weights:   6%|▌         | 26/427 [00:04<01:03,  6.36it/s]Loading weights:   6%|▋         | 27/427 [00:04<01:08,  5.82it/s]Loading weights:   7%|▋         | 28/427 [00:04<01:17,  5.16it/s]Loading weights:  37%|███▋      | 158/427 [00:04<00:01, 188.59it/s]Loading weights: 100%|██████████| 427/427 [00:04<00:00, 88.19it/s] 
+[SafeGen] 分层加密: enabled (key=dd97358ecbf9c2cd)
+[SafeGen] Loading v3 classifier (safety gate)...
+[SafeGen] Loading v4 classifier (category labeler)...
+[SafeGen] Ready  (v4 version: v4-streaming)
+[SafeGen] v3 global threshold: 0.6
+[SafeGen] v4 thresholds: {"normal": "0.90", "political": "0.80", "porn": "0.80", "violence": "0.80", "illegal": "0.80", "privacy": "0.85", "discrimination": "0.80", "rumor": "0.80"}
+[验证] 分层加密模块...
+[验证] 加密往返正常 | 密钥指纹: dd97358ecbf9c2cd
+
+=======================================================
+测试: normal-quantum
