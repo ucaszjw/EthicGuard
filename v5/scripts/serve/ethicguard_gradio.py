@@ -3,7 +3,8 @@ EthicGuard v5 Gradio — 实时流式安全监控
 阻断轮次不计入历史，避免污染后续生成。含分层加密状态显示。
 """
 from __future__ import annotations
-import argparse, gradio as gr
+import sys, os, argparse, gradio as gr
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from scripts.serve.safe_generator_v5 import SafeGenerator
 
 SAFE_REFUSAL = "抱歉，我无法生成此内容。请提出其他合规的问题。"
