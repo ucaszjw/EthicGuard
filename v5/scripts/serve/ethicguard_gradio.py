@@ -27,7 +27,7 @@ def build_app(gen: SafeGenerator):
         full_reply = ""
         final = None
         for item in gen.generate_stream(message, history=hist_dict,
-                                         max_new_tokens=256, temperature=0.3):
+                                         max_new_tokens=2048, temperature=0.3):
             if isinstance(item, dict):
                 final = item
             else:
@@ -108,6 +108,8 @@ def main():
     gen = SafeGenerator(quantize=args.quantize,
                         crypto_key=None if args.crypto_key == 0 else args.crypto_key)
     demo = build_app(gen)
+    os.environ["NO_PROXY"] = "localhost,127.0.0.1,::1"
+    os.environ["no_proxy"] = "localhost,127.0.0.1,::1"
     demo.queue().launch(server_name=args.host, server_port=args.port, share=False)
 
 if __name__ == "__main__":
