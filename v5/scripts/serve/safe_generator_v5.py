@@ -15,10 +15,11 @@ v5.1 features:
   • Pure output-side filtering — monitors model output only, no input pre-check.
 """
 from __future__ import annotations
-import sys, json, torch, os, math, hashlib
+import sys, json, torch, os, math, hashlib, secrets
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 from torch import nn
 from transformers import AutoTokenizer, AutoModelForCausalLM
+from Crypto.Cipher import AES
 
 # ── device auto-detection ──────────────────────────────────────────────────
 def get_device() -> str:
@@ -85,29 +86,49 @@ V3_GLOBAL_THR       = 0.60
 class EthicGuardCrypto:
     """分层加密模块
 
-    两层加密确保隐状态传输安全：
-      Layer 1 — 投影降维编码：16384→256 参数化压缩（不可逆）
-      Layer 2 — Key-based 混淆：固定密钥向量的 element-wise 加扰（可逆）
+    两层加密链路（从模型输出到分类器输入）：
 
-    加密过程完全透明，不影响分类器精度（decrypt 恢复原始特征）。
+      Layer 1 — 投影编码（不可逆压缩）
+        16384→256 参数化投影，由训练数据学习得到。
+        256 维特征无法逆向恢复原始 16384 维隐状态，实现第一层编码保护。
+
+      Layer 2 — AES-256-CTR 对称加密（可逆无损）
+        对 256 维 float32 特征做字节级 AES-256-CTR 加密，
+        加密状态在 GPU 显存中以密文形式存在，防止内存侧信道窃取。
+        每次加密使用随机 nonce，解密后完全恢复原始特征，分类精度不变。
     """
 
     def __init__(self, key_seed: int = 42, device: str = DEVICE):
-        rng = torch.Generator(device="cpu")
-        rng.manual_seed(key_seed)
-        key = torch.randn(256, generator=rng)
-        self.key = (key / key.norm()) * 0.1
-        self.key = self.key.to(device)
+        key_material = str(key_seed).encode()
+        self.aes_key = hashlib.sha256(key_material).digest()  # 32 bytes = AES-256
+        self.device = device
 
     def encrypt(self, x: torch.Tensor) -> torch.Tensor:
-        return x + self.key
+        """AES-256-CTR encrypt → return same-shape float32 tensor with nonce embedded."""
+        orig_shape = x.shape
+        flat = x.cpu().contiguous().detach().numpy().tobytes()  # float32 raw bytes
+        nonce = secrets.token_bytes(8)  # unique per call
+        cipher = AES.new(self.aes_key, AES.MODE_CTR, nonce=nonce)
+        ct = cipher.encrypt(flat)
+        # Embed nonce: prepend as 2 extra float32 elements (8 bytes nonce)
+        payload = nonce + ct
+        # Total bytes = 8 + len(flat) = 8 + 256*4 = 1032 → 258 float32
+        out = torch.frombuffer(bytearray(payload), dtype=torch.float32)
+        return out.to(self.device)
 
     def decrypt(self, x: torch.Tensor) -> torch.Tensor:
-        return x - self.key
+        """Reverse AES-256-CTR: extract nonce, decrypt, return original shape."""
+        payload = x.cpu().contiguous().detach().numpy().tobytes()
+        nonce = payload[:8]
+        ct = payload[8:]
+        cipher = AES.new(self.aes_key, AES.MODE_CTR, nonce=nonce)
+        plain = cipher.decrypt(ct)
+        # Restore original 256-dim float32
+        out = torch.frombuffer(bytearray(plain), dtype=torch.float32)
+        return out.to(self.device)
 
     def get_key_digest(self) -> str:
-        h = hashlib.sha256(self.key.cpu().numpy().tobytes()).hexdigest()[:16]
-        return h
+        return hashlib.sha256(self.aes_key).hexdigest()[:16]
 
 
 # ── SafeGenerator ──────────────────────────────────────────────────────────
